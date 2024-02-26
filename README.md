@@ -8,7 +8,7 @@ You can but many seconds in lits.txt and script in every message will take rando
 
 before
 Run Main.py
-put data in Data.txt / list.txt
+put data in Data.txt / list.txt /x.txt
 take Times From Risk File (choose what risk file you Want) then
 open list.txt and but List you copied
 
