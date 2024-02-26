@@ -1,60 +1,76 @@
+import ctypes
 import requests
 import time
 import random
 import pyfiglet
+from colorama import Fore, Style, init
 
-logo = pyfiglet.figlet_format("incress Probot xp By Ghalwash")
+init(autoreset=True)
+
+def set_cmd_title(title):
+    ctypes.windll.kernel32.SetConsoleTitleW(title)
+
+def print_error(message):
+    print(f'{Fore.RED}[X] {message}{Style.RESET_ALL}')
+
+def print_success(message):
+    print(f'{Fore.GREEN}{message}{Style.RESET_ALL}')
+
+def print_info(message):
+    print(f'{Fore.CYAN}                 {message}{Style.RESET_ALL}')
+    print(f'{Fore.CYAN}                 Recommended Choice For Important Accounts{Style.RESET_ALL}')
+    print(f'{Fore.WHITE}                             No Risk{Style.RESET_ALL}')
+    print('')
+
+def print_info1(message):
+    print(f'{Fore.RED}{message}{Style.RESET_ALL}')
+
+logo = pyfiglet.figlet_format("Increase Probot XP By Ghalwash")
 print(logo)
-print('Old Version ==> V1.0')
-print("")
+print(f'{Fore.RED}[!] Last Update: 22/11/2023{Style.RESET_ALL}')
+print_info('[-] Okay Safe Mode On')
 
+with open('list.txt', 'r') as list_file:
+    timeouts = [float(line.strip()) for line in list_file]
 
-choice = input('Choose an option:\n1. Enter data manually\n2. Import data from file\n')
-
-if choice == '1':
-    token = input('Enter your token: ')
-    channel_id = input('Enter the channel ID: ')
-    timeout = float(input('Enter your Timeout per Message (in seconds): '))
-elif choice == '2':
-    with open('Data.txt', 'r') as data_file:
-        token = data_file.readline().strip()
-        channel_id = data_file.readline().strip()
-        timeout = float(data_file.readline().strip())
-else:
-    print('Invalid choice. Exiting...')
-    exit()
-
-# Open the file containing the strings
-with open('x.txt', 'r') as f:
-    # Read all lines from the file into a list
-    lines = f.readlines()
+with open('Data.txt', 'r') as data_file:
+    token = data_file.readline().strip()
+    channel_id = data_file.readline().strip()
 
 c = 0
-successful_attempts = 0
-failed_attempts = 0
+total_messages_sent = 0
+total_failed_messages = 0
 
 while True:
-    # Select a random line from the list of lines
-    random_line = random.choice(lines)
-    
-    payload = {
-        'content': random_line
-    }
+    timeout = random.choice(timeouts)
+    print_info1(f"[-] Chosen Timeout: {timeout} seconds")
 
-    headers = {
-        'Authorization': token
-    }
+    with open('x.txt', 'r') as f:
+        lines = f.readlines()
+        random_line = random.choice(lines)
 
-    url = f'https://discord.com/api/v9/channels/{channel_id}/messages?limit=50'
- 
-    response = requests.post(url, json=payload, headers=headers)
+        payload = {
+            'content': random_line
+        }
 
-    if response.status_code == 200:
-        print(f'[!] Message Num {c + 1} sent successfully')
-        successful_attempts += 1
-    else:
-        print(f'[X] Failed to send message Num {c + 1}. Status code: {response.status_code}')
-        failed_attempts += 1
+        headers = {
+            'Authorization': token
+        }
 
-    c += 1
-    time.sleep(timeout)  # Wait for the specified seconds before sending the next message
+        url = f'https://discord.com/api/v9/channels/{channel_id}/messages?limit=50'
+
+        response = requests.post(url, json=payload, headers=headers)
+
+        if response.status_code == 200:
+            total_messages_sent += 1
+            set_cmd_title(f'Sent: {total_messages_sent} | Failed: {total_failed_messages}')
+            print_success(f'Sent {c + 1} Messages. Total Sent: {total_messages_sent}')
+            print('')
+        else:
+            total_failed_messages += 1
+            set_cmd_title(f'Sent: {total_messages_sent} | Failed: {total_failed_messages}')
+            print_error(f'Error {c + 1} Message. Total Failed Messages: {total_failed_messages}')
+            print('')
+
+        c += 1
+        time.sleep(timeout)
